@@ -1,0 +1,7 @@
+node_modules/
+*.log
+*.tmp-*
+perm-memory.json
+perm-memory.json.d/
+goldbach.json
+dist.json
