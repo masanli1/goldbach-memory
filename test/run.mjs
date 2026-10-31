@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,18 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('单位链（有限单元 → 无限输出）')
+{
+  const texts = ['逆序数来自矩阵理论。一个排列对应一条读取顺序。', '矩阵里全是散点。组合是读的时候展开出来的。']
+  const chain = buildUnitChain(texts)
+  const stats = chainStats(chain)
+  check('统计到有限单元', stats.units > 2)
+  check('建立了转移边', stats.edges > 0)
+  const text = generateFromChain(chain, { steps: 4, seed: 3 })
+  check('能生成非空文本', text.length > 0)
+  check('生成内容来自原单元', [...chain.vocabulary].some((unit) => text.includes(unit.slice(0, 4))))
 }
 
 console.log('矩阵记忆（散点 + 叙述索引）')
