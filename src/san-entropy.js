@@ -3,20 +3,7 @@
 //   统计不同 SAD 的出现次数 → SAN 分布 → 分布熵（bit）
 // 这比"字频熵"更能反映顺序结构，所以用它作为统一的熵度量。
 
-export function toCoordinates(text) {
-  // 默认把字符映射成码点（自然数坐标）；调用方可传入自己的坐标序列
-  return Array.from(String(text ?? '')).map((ch) => ch.codePointAt(0) ?? 0)
-}
-
-export function sadOf(path) {
-  if (!path || path.length < 2) return 0
-  let max = -Infinity
-  for (const value of path) if (value > max) max = value
-  const padded = [max + 1, ...path]
-  let sum = 0
-  for (let i = 1; i < padded.length; i += 1) sum += Math.abs(padded[i] - padded[i - 1])
-  return sum
-}
+import { toCoordinates, sadOf } from './path-fingerprint.js'
 
 export function sanDistribution(coordinates, { window = 8, stride = null } = {}) {
   const step = stride ?? window
