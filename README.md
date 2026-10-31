@@ -44,6 +44,29 @@ association.chain('2026-10-30 降噪', 4)                  // 联想链 + 节奏
 | 12 | 479,001,600 | 21,886 |
 | **17** | **355,687,428,096,000** | **18,859,677** |
 
+## 舞台：矩阵 + 索引 + 截断 + 阶段长度
+
+一条可交互记忆的完整结构：
+
+```
+基础矩阵（散点单位信息）
++ 完整逆序数索引（叙述顺序）
++ 截断（从第几位开始）
++ 阶段长度（取多少位）
+= 任意区间都能提取
+```
+
+```js
+import { makeStage, extract, entropyOf, evolve } from 'goldbach-memory'
+const stage = makeStage('原理', '逆序数来自矩阵理论。一个排列对应一条读取顺序。')
+extract(stage)                                   // 完整叙述
+extract(stage, { truncation: 1, length: 2 })     // 截断 + 阶段长度
+entropyOf(text)                                  // 熵（bit）
+evolve([stage], currentText, { tolerance: 0.6 }) // 找略低熵的一档 → 差值即推动
+```
+
+实测：完整提取熵 5.0841；演化选中 Δ0.1383 的那一档作为下一状态（推动力）。
+
 ## 专家矩阵：滑块、商、可拼接
 
 ```

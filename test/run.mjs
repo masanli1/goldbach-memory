@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,19 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('舞台：矩阵 + 索引 + 截断 + 阶段长度')
+{
+  const stage = makeStage('原理', '逆序数来自矩阵理论。一个排列对应一条读取顺序。矩阵里全是散点。')
+  check('生成矩阵与索引', stage.units.length >= 2 && typeof stage.narrative.rank === 'number')
+  const full = extract(stage)
+  check('完整提取非空', full.text.length > 0)
+  const sliced = extract(stage, { truncation: 1, length: 1 })
+  check('截断 + 阶段长度生效', sliced.units.length === 1)
+  check('熵可计算', entropyOf(full.text) > 0)
+  const step = evolve([stage], full.text, { tolerance: 2 })
+  check('演化给出推动或空', step.push === null || step.push.delta > 0)
 }
 
 console.log('专家矩阵与商')
