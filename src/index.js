@@ -11,4 +11,5 @@ export { MatrixMemory, splitUnits, layoutMatrix, narrativeRank } from './matrix-
 export { buildUnitChain, generateFromChain, chainStats } from './unit-chain.js'
 export { createExpertSpace, quotientOf } from './experts.js'
 export { makeStage, extract, entropyOf, evolve } from './stage.js'
+export { toCoordinates, sadOf, sanDistribution, sanEntropy } from './san-entropy.js'
 export { topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates, sadOf, shuffledPath } from './path-fingerprint.js'

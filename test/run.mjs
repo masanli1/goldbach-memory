@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, sanEntropy, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,19 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('SAN 熵（指纹分布熵）')
+{
+  const text = '陈昂站在台湾街头，咽下了一片透明的小药片。时间在他眼中忽然变得很慢很慢。'
+  const result = sanEntropy(text, { window: 6 })
+  check('SAN 熵可计算', typeof result === 'object' && result.entropy > 0)
+  check('统计到路径', result.paths > 0)
+  const short = sanEntropy('短', { window: 6 })
+  check('短文本不报错', typeof short === 'object')
+  const a = sanEntropy('一二三四五六七八九十', { window: 4 })
+  const b = sanEntropy('一三二五四六七九十十', { window: 4 })
+  check('不同顺序给出不同熵', a.entropy !== b.entropy || a.distinctSad !== b.distinctSad)
 }
 
 console.log('舞台：矩阵 + 索引 + 截断 + 阶段长度')
