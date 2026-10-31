@@ -109,6 +109,10 @@ sparseProfile(series, 0.02)   // → { ratio, maxError, rmse }
 
 ## 许可
 
-**学术免费，商用收费**，详见 [LICENSE](./LICENSE)。
+**学术免费，商用收费**：
+
+- 学术 / 个人 / 非商业：免费，详见 [LICENSE](./LICENSE)
+- 商业使用：按档位购买授权，价格见 [COMMERCIAL.md](./COMMERCIAL.md)
+- **授权咨询：2459551532@qq.com**
 
 作者：**masanli1**
