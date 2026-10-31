@@ -1,6 +1,7 @@
 // 舞台：一条记忆 = 基础矩阵 + 完整逆序数索引 + 截断 + 阶段长度。
 // 任意信息提取 = 在"索引顺序"上取一个区间（截断 + 阶段长度）。
 import { rankOf, unrank } from './perm.js'
+import { sanEntropy } from './san-entropy.js'
 import { splitUnits, layoutMatrix } from './matrix-memory.js'
 
 export function makeStage(key, text, { cols = 4 } = {}) {
@@ -38,16 +39,9 @@ export function extract(stage, { truncation = 0, length = null } = {}) {
 }
 
 // 熵：字符分布的信息熵（bit）
+// 统一用 SAN 指纹熵（SAD 分布的熵），与插件侧保持一致
 export function entropyOf(text) {
-  const counts = new Map()
-  for (const ch of String(text)) counts.set(ch, (counts.get(ch) ?? 0) + 1)
-  const total = [...counts.values()].reduce((sum, value) => sum + value, 0) || 1
-  let entropy = 0
-  for (const value of counts.values()) {
-    const p = value / total
-    entropy -= p * Math.log2(p)
-  }
-  return Number(entropy.toFixed(4))
+  return sanEntropy(String(text), { window: 6 }).entropy
 }
 
 // 演化：找一条"比当前熵略低一点"的状态，差值就是推动力

@@ -43,6 +43,9 @@ export function entropyOfDistribution(counts) {
 // 对外主入口：文本（或坐标序列）→ SAN 熵
 export function sanEntropy(input, { window = 8 } = {}) {
   const coordinates = Array.isArray(input) ? input : toCoordinates(input)
+  // 短文本自动缩窗，避免只有一条路径（熵恒 0）
+  const span = coordinates.length >= 2 * window ? window : Math.max(2, Math.floor(coordinates.length / 2))
+  window = span
   if (coordinates.length < window + 1) {
     // 太短就退化为单窗口，但返回结构保持一致
     return { entropy: 0, paths: 0, distinctSad: 0, window, short: true }
