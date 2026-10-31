@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -53,6 +53,22 @@ console.log('哥德巴赫联想')
   check('互素素数桥为 1', linked.bridge === 1)
   check('联想链长度 ≥ 2', association.chain('降噪完成', 4).path.length >= 2)
   check('按和分族返回结果', Array.isArray(association.families()))
+}
+
+console.log('紧凑矩阵索引')
+{
+  const packed = new PackedIndex()
+  const cap = capacityOf(17)
+  let seed = 42
+  const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648 }
+  for (let i = 0; i < 10000; i += 1) packed.push(Math.floor(rnd() * cap))
+  check('写入 10000 条', packed.stats().count === 10000)
+  check('每条 6 字节', packed.stats().bytesPerEntry === 6)
+  check('按下标读回', packed.get(1234) !== null)
+  check('按需展开成排列', packed.expand(7, 17).permutation.length === 17)
+  check('可看成矩阵', packed.matrix(16).rows === 625)
+  const round = PackedIndex.fromBase64(packed.toBase64())
+  check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
 }
 
 console.log('稀疏寻址')
