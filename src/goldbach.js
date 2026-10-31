@@ -84,7 +84,7 @@ function hashKey(key) {
   return hash
 }
 
-export function createGoldbachMemory({ path = GOLDBACH_PATH, logger = console } = {}) {
+export function createGoldbachMemory({ path = GOLDBACH_PATH, logger = console, onChain = null } = {}) {
   let data = { nodes: {}, chains: [] }
   try { data = { ...data, ...JSON.parse(readFileSync(path, 'utf8')) } } catch {}
 
@@ -182,6 +182,11 @@ export function createGoldbachMemory({ path = GOLDBACH_PATH, logger = console } 
     const rhythm = steps.flatMap((step) => step.gaps).slice(0, 24)
     data.chains = [{ at: Date.now(), path, rhythm }, ...(data.chains ?? [])].slice(0, 50)
     save()
+    try {
+      if (typeof onChain === 'function') {
+        onChain({ path, steps: steps.map((step) => ({ from: step.from, to: step.to, strength: step.strength, bridge: step.bridge })), rhythm })
+      }
+    } catch {}
     return { path, steps, rhythm }
   }
 
