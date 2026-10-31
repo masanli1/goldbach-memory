@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -53,6 +53,21 @@ console.log('哥德巴赫联想')
   check('互素素数桥为 1', linked.bridge === 1)
   check('联想链长度 ≥ 2', association.chain('降噪完成', 4).path.length >= 2)
   check('按和分族返回结果', Array.isArray(association.families()))
+}
+
+console.log('稀疏寻址')
+{
+  const N = 512
+  const smooth = Array.from({ length: N }, (_, i) => Math.sin(2 * Math.PI * i / N) + 0.3 * Math.sin(6 * Math.PI * i / N))
+  let seed = 7
+  const rand = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648 * 2 - 1 }
+  const noise = Array.from({ length: N }, rand)
+  const smoothProfile = sparseProfile(smooth, 0.02)
+  const noiseProfile = sparseProfile(noise, 0.02)
+  check('平滑数据保留 < 10%', smoothProfile.ratio < 0.1)
+  check('平滑数据还原误差 < 容差', smoothProfile.maxError <= 0.02 + 1e-9)
+  check('随机数据必须几乎全存', noiseProfile.ratio > 0.9)
+  check('随机数据的边界被正确暴露', noiseProfile.ratio > smoothProfile.ratio)
 }
 
 console.log('分区存储')

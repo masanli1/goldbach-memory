@@ -3,3 +3,4 @@ export { createPermMemory, unrank, rankOf, inversionOf, shardOf, capacityOf, PER
 export { createGoldbachMemory, GOLDBACH_PATH } from './goldbach.js'
 export { createCrtMemory, encodeResidues, decodeResidues, productOf, residueSketch, sketchDistance } from './crt.js'
 export { writeJsonAtomic, readJsonSafe, createPartitionedStore } from './atomic.js'
+export { adaptiveKeyframes, restoreFromKeyframes, reconstructionError, sparseProfile } from './sparse.js'
