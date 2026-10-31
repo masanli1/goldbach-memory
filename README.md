@@ -63,3 +63,5 @@ association.chain('2026-10-30 降噪', 4)                  // 联想链 + 节奏
 ## 许可
 
 **学术免费，商用收费**，详见 [LICENSE](./LICENSE)。
+
+作者：**masanli1**

@@ -8,6 +8,7 @@
     ".": "./src/index.js"
   },
   "license": "SEE LICENSE IN LICENSE",
+  "author": "masanli1",
   "keywords": ["memory", "permutation", "lehmer-code", "goldbach", "crt", "association"],
   "engines": { "node": ">=18" },
   "scripts": {
