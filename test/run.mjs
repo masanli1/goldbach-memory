@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -80,6 +80,13 @@ console.log('拓扑指纹')
   check('不同输入指纹有差异', fingerprintSimilarity(a, c) < 1)
   check('相似度在 0..1', fingerprintSimilarity(a, c) >= 0 && fingerprintSimilarity(a, c) <= 1)
   check('素数标记可计算', typeof pathPrimeTag(a, { mode: 'sum' }) === 'bigint')
+  const positions = ['降噪跑完了', '今天天气不错', '记忆矩阵扩容', '英语打卡三天'].map((text) =>
+    positionOf(topologyFingerprint(toCoordinates(text), { paths: 64, bins: 16, seed: 1 }), { precision: 2 }))
+  check('不同输入落到不同位置', new Set(positions).size === positions.length)
+  const sameText = '降噪跑完了'
+  const p1 = positionOf(topologyFingerprint(toCoordinates(sameText), { paths: 64, bins: 16, seed: 1 }), { precision: 2 })
+  const p2 = positionOf(topologyFingerprint(toCoordinates(sameText), { paths: 64, bins: 16, seed: 1 }), { precision: 2 })
+  check('同一输入位置稳定', p1 === p2)
 }
 
 console.log('矩阵压缩存储')

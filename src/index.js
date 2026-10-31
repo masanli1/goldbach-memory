@@ -6,4 +6,4 @@ export { writeJsonAtomic, readJsonSafe, createPartitionedStore } from './atomic.
 export { adaptiveKeyframes, restoreFromKeyframes, reconstructionError, sparseProfile } from './sparse.js'
 export { PackedIndex } from './packed.js'
 export { MatrixStore } from './store.js'
-export { topologyFingerprint, fingerprintSimilarity, pathPrimeTag, toCoordinates, sadOf, shuffledPath } from './path-fingerprint.js'
+export { topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates, sadOf, shuffledPath } from './path-fingerprint.js'

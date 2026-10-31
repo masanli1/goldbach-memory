@@ -86,6 +86,31 @@ export function pathPrimeTag(fingerprint, { mode = 'product', limit = 64 } = {})
   return primes.reduce((product, p) => product * BigInt(p), 1n)
 }
 
+// 位置编码：把指纹分布量化成一个"位置编号"。
+// 设计意图是"每一个特殊分布对应一个位置"，所以这里关心的是
+//   1) 不同输入是否落到不同位置（可区分性/抗碰撞）
+//   2) 同一输入的小扰动是否落到同一或邻近位置（稳定性）
+export function positionOf(fingerprint, { precision = 3 } = {}) {
+  const bins = fingerprint?.vector ?? []
+  const shape = bins.map((value) => Number(value.toFixed(precision)))
+  // 位置 = 形状的 FNV 哈希
+  let hash = 2166136261
+  for (let i = 0; i < shape.length; i += 1) {
+    hash ^= Math.round(shape[i] * 10 ** precision + i * 7)
+    hash = Math.imul(hash, 16777619) >>> 0
+  }
+  return hash
+}
+
+// 近邻位置：形状差异小于 tolerance 时视为"同一位置附近"
+export function positionDistance(a, b) {
+  const left = a?.vector ?? []
+  const right = b?.vector ?? []
+  let sum = 0
+  for (let i = 0; i < Math.min(left.length, right.length); i += 1) sum += Math.abs(left[i] - right[i])
+  return Number(sum.toFixed(4))
+}
+
 // 序列 → 一维坐标（文本按字符码，图像可按像素亮度）
 export function toCoordinates(input) {
   if (typeof input === 'string') return Array.from(input).map((char) => char.codePointAt(0))

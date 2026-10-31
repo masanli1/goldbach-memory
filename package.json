@@ -1,6 +1,6 @@
 {
   "name": "goldbach-memory",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "大容量排列记忆 + 哥德巴赫联想：阶乘寻址、CRT 分片、素数周期关联",
   "type": "module",
   "main": "src/index.js",
