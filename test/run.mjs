@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,17 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('拓扑指纹')
+{
+  const a = topologyFingerprint(toCoordinates('把 120 个视频的降噪跑完了'), { paths: 64, bins: 16, seed: 1 })
+  const b = topologyFingerprint(toCoordinates('把 120 个视频的降噪跑完了'), { paths: 64, bins: 16, seed: 1 })
+  const c = topologyFingerprint(toCoordinates('今天天气不错适合出门散步'), { paths: 64, bins: 16, seed: 1 })
+  check('同输入指纹一致', fingerprintSimilarity(a, b) === 1)
+  check('不同输入指纹有差异', fingerprintSimilarity(a, c) < 1)
+  check('相似度在 0..1', fingerprintSimilarity(a, c) >= 0 && fingerprintSimilarity(a, c) <= 1)
+  check('素数标记可计算', typeof pathPrimeTag(a, { mode: 'sum' }) === 'bigint')
 }
 
 console.log('矩阵压缩存储')

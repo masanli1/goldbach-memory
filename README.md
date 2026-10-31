@@ -44,6 +44,21 @@ association.chain('2026-10-30 降噪', 4)                  // 联想链 + 节奏
 | 12 | 479,001,600 | 21,886 |
 | **17** | **355,687,428,096,000** | **18,859,677** |
 
+## 拓扑指纹（SAD 分布）
+
+把序列下标当作哈密顿路径，随机采样若干条路径，统计路径上相邻差值之和（SAD）的分布：
+
+```js
+import { topologyFingerprint, fingerprintSimilarity, toCoordinates } from 'goldbach-memory'
+
+const fp = topologyFingerprint(toCoordinates('一段文字'), { paths: 256, bins: 24 })
+fingerprintSimilarity(fpA, fpB)   // 0..1
+```
+
+**诚实结论（实测）**：在本项目的 113 条中文短文上，SAD 分布指纹与语义相似度的
+**秩相关只有 0.06**（排名化后 0.15）。也就是说它捕捉的是**尺度/统计量**，
+不足以单独当语义特征。要让它有区分力，需要改成"局部路径 + 顺序敏感特征"，而不是均匀随机排列。
+
 ## 矩阵压缩存储：索引只留排名，载荷按需展开
 
 `MatrixStore` 把"一堆键值记忆"压成两个文件：
