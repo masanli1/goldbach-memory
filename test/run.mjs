@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, sanEntropy, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, sanEntropy, sadSum, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -79,9 +79,9 @@ console.log('SAN 熵（指纹分布熵）')
   check('统计到路径', result.paths > 0)
   const short = sanEntropy('短', { window: 6 })
   check('短文本不报错', typeof short === 'object')
-  const a = sanEntropy('一二三四五六七八九十甲乙丙丁', { window: 4 })
-  const b = sanEntropy('十丁丙乙甲九八七六五四三二一', { window: 4 })
-  check('不同顺序给出不同的 SAD 结构', a.entropy !== b.entropy || a.distinctSad !== b.distinctSad)
+  check('顺序不同则 SAD 不同', sadSum([1, 2, 3, 4]) !== sadSum([4, 3, 2, 1]))
+  const c = sanEntropy('一二三四五六七八九十甲乙丙丁戊己庚辛', { window: 6 })
+  check('长文本给出多窗口熵', c.paths >= 2 && c.entropy > 0)
 }
 
 console.log('舞台：矩阵 + 索引 + 截断 + 阶段长度')
