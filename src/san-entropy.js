@@ -18,14 +18,21 @@ export function sadSum(path) {
 
 export function sanDistribution(coordinates, { window = 8, stride = null } = {}) {
   const step = stride ?? window
-  const counts = new Map()
-  let paths = 0
+  // 先收集 SAD，再分桶（不分桶熵会饱和成 log2(路径数)）
+  const values = []
   for (let i = 0; i + window <= coordinates.length; i += step) {
-    const sad = sadSum(coordinates.slice(i, i + window))
-    counts.set(sad, (counts.get(sad) ?? 0) + 1)
-    paths += 1
+    values.push(sadSum(coordinates.slice(i, i + window)))
   }
-  return { counts, paths }
+  const buckets = Math.min(32, Math.max(4, Math.ceil(Math.sqrt(values.length))))
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const width = Math.max(1, (max - min) / buckets)
+  const counts = new Map()
+  for (const value of values) {
+    const bin = Math.min(buckets - 1, Math.floor((value - min) / width))
+    counts.set(bin, (counts.get(bin) ?? 0) + 1)
+  }
+  return { counts, paths: values.length, buckets, distinctSad: new Set(values).size }
 }
 
 export function entropyOfDistribution(counts) {
@@ -50,6 +57,6 @@ export function sanEntropy(input, { window = 8 } = {}) {
     // 太短就退化为单窗口，但返回结构保持一致
     return { entropy: 0, paths: 0, distinctSad: 0, window, short: true }
   }
-  const { counts, paths } = sanDistribution(coordinates, { window })
-  return { entropy: entropyOfDistribution(counts), paths, distinctSad: counts.size, window }
+  const { counts, paths, buckets, distinctSad } = sanDistribution(coordinates, { window })
+  return { entropy: entropyOfDistribution(counts), paths, distinctSad, buckets, window }
 }
