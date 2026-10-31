@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, sanEntropy, sadSum, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, sanOf, sadSum, makeStage, extract, entropyOf, evolve, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -71,17 +71,17 @@ console.log('紧凑矩阵索引')
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
 }
 
-console.log('SAN 熵（指纹分布熵）')
+console.log('SAN（哈密顿回路分布）')
 {
-  const text = '陈昂站在台湾街头，咽下了一片透明的小药片。时间在他眼中忽然变得很慢很慢。'
-  const result = sanEntropy(text, { window: 6 })
-  check('SAN 熵可计算', typeof result === 'object' && result.entropy > 0)
-  check('统计到路径', result.paths > 0)
-  const short = sanEntropy('短', { window: 6 })
-  check('短文本不报错', typeof short === 'object')
-  check('顺序不同则 SAD 不同', sadSum([1, 2, 3, 4]) !== sadSum([4, 3, 2, 1]))
-  const c = sanEntropy('一二三四五六七八九十甲乙丙丁戊己庚辛', { window: 6 })
-  check('长文本给出多窗口熵', c.paths >= 2 && c.entropy > 0)
+  const sentence = Array.from('陈昂站在台湾街头咽下了一片透明的小药片')
+  const random = [1, 57, 12, 88, 33, 91, 7, 64, 25, 79]
+  const a = sanOf(sentence.map((ch) => ch.codePointAt(0)))
+  const b = sanOf(random)
+  check('点集给出 SAN 统计量', a.samples > 0 && a.n === sentence.length)
+  check('SAD 均值与标准差可计算', a.meanSad > 0 && a.stdSad >= 0)
+  check('分布熵在合理范围', a.entropy > 0 && a.entropy <= Math.log2(a.bins))
+  check('不同点集给出不同指纹', a.meanSad !== b.meanSad)
+  check('太少的点集不报错', sanOf([1, 2]).samples === 0)
 }
 
 console.log('舞台：矩阵 + 索引 + 截断 + 阶段长度')
