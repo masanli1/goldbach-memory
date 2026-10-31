@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,22 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('矩阵记忆（散点 + 叙述索引）')
+{
+  const memory = new MatrixMemory({ cols: 3 })
+  const text = '逆序数来自矩阵理论。一个排列对应一条读取顺序。矩阵里全是散点，没有组合信息。'
+  const entry = memory.put('原理', text)
+  check('文本切成散点', entry.units.length >= 2)
+  check('矩阵布局正确', entry.grid.cols === 3)
+  check('按索引读回原文', memory.read('原理').replace(/。/g, '') === text.replace(/。/g, ''))
+  const n = entry.units.length
+  const forward = memory.readWithOrder('原理', [...Array(n).keys()])
+  const backward = memory.readWithOrder('原理', [...Array(n).keys()].reverse())
+  check('同矩阵不同索引得到不同叙述', forward !== backward)
+  const expanded = memory.expand(entry.rank, entry.units)
+  check('索引可以展开成矩阵', expanded.grid.length > 0)
 }
 
 console.log('三层生成（混沌→时序→空间）')

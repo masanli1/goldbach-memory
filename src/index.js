@@ -7,4 +7,5 @@ export { adaptiveKeyframes, restoreFromKeyframes, reconstructionError, sparsePro
 export { PackedIndex } from './packed.js'
 export { chaosLayer, riemannLayer, spaceLayer, generateWorld } from './chaos-layers.js'
 export { MatrixStore } from './store.js'
+export { MatrixMemory, splitUnits, layoutMatrix, narrativeRank } from './matrix-memory.js'
 export { topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates, sadOf, shuffledPath } from './path-fingerprint.js'
