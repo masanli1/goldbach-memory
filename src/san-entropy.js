@@ -44,8 +44,8 @@ export function entropyOfDistribution(counts) {
 export function sanEntropy(input, { window = 8 } = {}) {
   const coordinates = Array.isArray(input) ? input : toCoordinates(input)
   if (coordinates.length < window + 1) {
-    // 太短就退化为单窗口
-    return Number(entropyOfDistribution(new Map([[sadSum(coordinates), 1]])).toFixed(4))
+    // 太短就退化为单窗口，但返回结构保持一致
+    return { entropy: 0, paths: 0, distinctSad: 0, window, short: true }
   }
   const { counts, paths } = sanDistribution(coordinates, { window })
   return { entropy: entropyOfDistribution(counts), paths, distinctSad: counts.size, window }

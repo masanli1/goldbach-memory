@@ -79,9 +79,9 @@ console.log('SAN 熵（指纹分布熵）')
   check('统计到路径', result.paths > 0)
   const short = sanEntropy('短', { window: 6 })
   check('短文本不报错', typeof short === 'object')
-  const a = sanEntropy('一二三四五六七八九十', { window: 4 })
-  const b = sanEntropy('一三二五四六七九十十', { window: 4 })
-  check('不同顺序给出不同熵', a.entropy !== b.entropy || a.distinctSad !== b.distinctSad)
+  const a = sanEntropy('一二三四五六七八九十甲乙丙丁', { window: 4 })
+  const b = sanEntropy('十丁丙乙甲九八七六五四三二一', { window: 4 })
+  check('不同顺序给出不同的 SAD 结构', a.entropy !== b.entropy || a.distinctSad !== b.distinctSad)
 }
 
 console.log('舞台：矩阵 + 索引 + 截断 + 阶段长度')
