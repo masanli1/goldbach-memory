@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, MatrixMemory, createExpertSpace, quotientOf, buildUnitChain, generateFromChain, chainStats, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,23 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('专家矩阵与商')
+{
+  const space = createExpertSpace({ matrices: [
+    { name: 'A', texts: ['逆序数来自矩阵理论。排列决定读取顺序。'], slider: 0.9 },
+    { name: 'B', texts: ['今天很热。空调坏了。'], slider: 0.3 },
+    { name: 'C', texts: ['矩阵里全是散点。组合是读出来的。'], slider: 0.6 },
+  ] })
+  check('登记了三个专家', space.stats().experts.length === 3)
+  const routes = space.route('A')
+  check('能算出商并按滑块封顶', routes.every((row) => row.quotient <= 0.9))
+  check('路由有排序', routes[0].routeScore >= routes[routes.length - 1].routeScore)
+  const merged = space.splice('A', 'C', 'A+C')
+  check('拼接出新矩阵', merged.name === 'A+C' && merged.units >= 2)
+  const q = quotientOf({ name: 'x', texts: ['a。b。'] }, { name: 'y', texts: ['a。c。'] }, 1)
+  check('商有定义', typeof q.quotient === 'number')
 }
 
 console.log('单位链（有限单元 → 无限输出）')

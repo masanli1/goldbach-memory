@@ -9,4 +9,5 @@ export { chaosLayer, riemannLayer, spaceLayer, generateWorld } from './chaos-lay
 export { MatrixStore } from './store.js'
 export { MatrixMemory, splitUnits, layoutMatrix, narrativeRank } from './matrix-memory.js'
 export { buildUnitChain, generateFromChain, chainStats } from './unit-chain.js'
+export { createExpertSpace, quotientOf } from './experts.js'
 export { topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates, sadOf, shuffledPath } from './path-fingerprint.js'
