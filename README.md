@@ -44,6 +44,38 @@ association.chain('2026-10-30 降噪', 4)                  // 联想链 + 节奏
 | 12 | 479,001,600 | 21,886 |
 | **17** | **355,687,428,096,000** | **18,859,677** |
 
+## 矩阵压缩存储：索引只留排名，载荷按需展开
+
+`MatrixStore` 把"一堆键值记忆"压成两个文件：
+
+```
+<base>.idx   magic + count + count × rank(6 字节)
+<base>.dat   brotli( 每行 [key, payload] )
+```
+
+实测：
+
+| 记录数 | JSON 体积 | 矩阵存储 | 倍数 | 每条 |
+|---|---|---|---|---|
+| 500 | 51 KB | 5.2 KB | ~10× | 10 字节 |
+| 2000 | 201 KB | 19.8 KB | **10.2×** | 10.2 字节 |
+
+用法：
+
+```js
+import { MatrixStore } from 'goldbach-memory'
+
+const store = new MatrixStore({ base: '~/.dsh/my-memory', order: 17 })
+store.put('名字', { value: '马三立' })
+store.address('名字')      // 只取排名，不展开
+store.get('名字')          // 按需展开
+store.save()               // 落盘（索引 + 压缩载荷）
+store.load()               // 重新加载
+```
+
+> 真实数据实测：把 dsh-dafeiyu 的 17 条记忆（6.2 KB）压成 776 字节，**7.95 倍**；
+> 条数越多倍数越高（固定 8 字节头会被摊薄）。
+
 ## 紧凑矩阵索引：不存逆序数，只存排名
 
 一条记忆在旧格式里要存 `rank + permutation[17] + inversion[17] + shard + surges`，

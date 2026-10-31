@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,23 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('矩阵压缩存储')
+{
+  const store = new MatrixStore({ base: join(dir, 'matrix'), order: 17 })
+  const facts = Array.from({ length: 500 }, (_, i) => [`key${i}`, { text: `第 ${i} 条记忆：降噪跑完了`, n: i }])
+  for (const [key, value] of facts) store.put(key, value)
+  const stats = store.save()
+  check('写入 500 条', stats.entries === 500)
+  check('索引每条 6 字节', stats.indexBytes === 8 + 500 * 6)
+  check('载荷被压缩', stats.compressionRatio > 3)
+  const reloaded = new MatrixStore({ base: join(dir, 'matrix'), order: 17 })
+  check('可从磁盘重载', reloaded.load() && reloaded.rows.length === 500)
+  check('按需展开单条', reloaded.get('key77').n === 77)
+  check('可按地址查排名', typeof reloaded.address('key77') === 'number')
+  const jsonBytes = Buffer.byteLength(JSON.stringify(Object.fromEntries(facts)))
+  check('总体积小于 JSON', stats.totalBytes < jsonBytes)
 }
 
 console.log('稀疏寻址')

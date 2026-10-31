@@ -5,3 +5,4 @@ export { createCrtMemory, encodeResidues, decodeResidues, productOf, residueSket
 export { writeJsonAtomic, readJsonSafe, createPartitionedStore } from './atomic.js'
 export { adaptiveKeyframes, restoreFromKeyframes, reconstructionError, sparseProfile } from './sparse.js'
 export { PackedIndex } from './packed.js'
+export { MatrixStore } from './store.js'
