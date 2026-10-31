@@ -1,5 +1,5 @@
 // 最小测试：排列往返、容量、CRT 纠错、哥德巴赫关联、分区存储。
-import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
+import { createPermMemory, unrank, rankOf, capacityOf, createCrtMemory, createGoldbachMemory, createPartitionedStore, sparseProfile, PackedIndex, MatrixStore, generateWorld, topologyFingerprint, fingerprintSimilarity, pathPrimeTag, positionOf, positionDistance, toCoordinates } from '../src/index.js'
 import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -69,6 +69,18 @@ console.log('紧凑矩阵索引')
   check('可看成矩阵', packed.matrix(16).rows === 625)
   const round = PackedIndex.fromBase64(packed.toBase64())
   check('base64 往返一致', round.get(1234) === packed.get(1234) && round.count === 10000)
+}
+
+console.log('三层生成（混沌→时序→空间）')
+{
+  const world = generateWorld({ seed: 0.4, length: 512 })
+  check('混沌层有确定熵值', world.chaosEntropy > 3 && world.chaosEntropy < 4.2)
+  check('自适应参数落在混沌区', world.r >= 3.57 && world.r <= 4)
+  check('时序层产生排列', world.points === 512)
+  check('空间层地址基本唯一（>99%）', world.uniqueAddresses / world.points > 0.99)
+  const a = generateWorld({ seed: 0.4, length: 128 })
+  const b = generateWorld({ seed: 0.7, length: 128 })
+  check('不同种子产生不同轨迹', JSON.stringify(a.sample) !== JSON.stringify(b.sample))
 }
 
 console.log('拓扑指纹')
