@@ -1,6 +1,6 @@
 {
   "name": "goldbach-memory",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "大容量排列记忆 + 哥德巴赫联想：阶乘寻址、CRT 分片、素数周期关联",
   "type": "module",
   "main": "src/index.js",
@@ -9,8 +9,17 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "masanli1",
-  "keywords": ["memory", "permutation", "lehmer-code", "goldbach", "crt", "association"],
-  "engines": { "node": ">=18" },
+  "keywords": [
+    "memory",
+    "permutation",
+    "lehmer-code",
+    "goldbach",
+    "crt",
+    "association"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "node test/run.mjs",
     "demo": "node examples/demo.mjs"
